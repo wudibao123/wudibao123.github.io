@@ -1,0 +1,1081 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>无敌暴龙之战士小冲噼里啪啦v8.1</title>
+    <style>
+        @font-face {
+            font-family: 'CustomFont';
+            src: url('Font.ttf') format('truetype');
+            font-display: swap;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'CustomFont', Arial, sans-serif; }
+        body { height: 100vh; background: #000; position: relative; overflow: hidden; }
+        
+        .fullscreen-splash {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #000;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+        }
+        .splash-video {
+            width: 100vw;
+            height: 100vh;
+            object-fit: cover;
+            object-position: center;
+            pointer-events: none;
+        }
+        .splash-video::-webkit-media-controls { display: none !important; }
+        .splash-video::-webkit-media-controls-panel { display: none !important; }
+        .splash-video::-webkit-media-controls-play-button { display: none !important; }
+        .splash-video::-webkit-media-controls-volume-slider { display: none !important; }
+        .splash-video::-webkit-media-controls-timeline { display: none !important; }
+        
+        .font-error-tip {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255,0,0,0.9);
+            color: #fff;
+            padding: 20px 40px;
+            font-size: 22px;
+            border-radius: 10px;
+            z-index: 99999;
+            display: none;
+            text-align: center;
+        }
+        
+        .video-update-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.9);
+            color: #fff;
+            padding: 30px;
+            border-radius: 20px;
+            z-index: 100000;
+            display: none;
+            text-align: center;
+            width: 85%;
+            max-width: 400px;
+        }
+        .update-title { font-size: 28px; color: #00ff99; margin-bottom: 15px; }
+        .update-desc { font-size: 20px; margin-bottom: 25px; }
+        .update-btn {
+            padding: 12px 40px;
+            font-size: 22px;
+            font-weight: bold;
+            color: #fff;
+            background: url('ui_btn_wjms_red.png') no-repeat center center / cover;
+            background-color: #4CAF50;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.1s ease;
+        }
+        .update-btn:active { transform: scale(0.95); }
+        
+        .main-menu {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: url('kj.jpg') no-repeat center center;
+            background-size: cover;
+            background-color: #222;
+            z-index: 9998;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .menu-video-container {
+            width: 85%;
+            max-width: 500px;
+            height: auto;
+            border-radius: 15px;
+            overflow: hidden;
+            margin-bottom: 15px;
+            position: relative;
+            pointer-events: none;
+        }
+        .menu-video {
+            width: 100%;
+            height: auto;
+            display: block;
+            object-fit: cover;
+            pointer-events: none;
+        }
+        .non-commercial-tip {
+            color: #ff0000;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 25px;
+            text-shadow: 0 0 5px rgba(0,0,0,0.7);
+            text-align: center;
+            z-index: 10;
+        }
+        .level-info {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: #fff;
+            font-size: 18px;
+            font-weight: bold;
+            text-shadow: 0 0 10px #000;
+            z-index: 10;
+        }
+        .level-up-btn {
+            position: absolute;
+            top: 60px;
+            left: 20px;
+            padding: 5px 10px;
+            font-size: 14px;
+            color: #fff;
+            background: #ff9900;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            display: none;
+            z-index: 10;
+            box-shadow: none;
+            transition: transform 0.1s ease;
+        }
+        .start-btn, .gold-rush-btn {
+            padding: 20px 60px;
+            font-size: 32px;
+            font-weight: bold;
+            color: #fff;
+            background: url('ui_btn_wjms_red.png') no-repeat center center / cover;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            margin-bottom: 30px;
+            z-index: 10;
+            box-shadow: none;
+            transition: transform 0.1s ease;
+        }
+        .reward-btn {
+            padding: 15px 40px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #fff;
+            background: url('ui_btn_wjms_gry.png') no-repeat center center / cover;
+            border: none;
+            border-radius: 40px;
+            cursor: pointer;
+            margin-top: 10px;
+            z-index: 10;
+            box-shadow: none;
+            transition: transform 0.1s ease;
+        }
+        .difficulty-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #fff;
+            background: url('ui_btn_wjms_red.png') no-repeat center center / cover;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            z-index: 10;
+            box-shadow: none;
+            transition: transform 0.1s ease;
+        }
+        .official-group-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            padding: 12px 25px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #fff;
+            background: url('ui_btn_wjms_red.png') no-repeat center center / cover;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            z-index: 9997;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            touch-action: manipulation;
+            box-shadow: none;
+            transition: transform 0.1s ease;
+        }
+        .official-group-btn::before { content: "📱"; font-size: 22px; }
+        .custom-music-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 180px;
+            padding: 12px 25px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #fff;
+            background: url('ui_btn_wjms_red.png') no-repeat center center / cover;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            z-index: 9997;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            touch-action: manipulation;
+            box-shadow: none;
+            transition: transform 0.1s ease;
+        }
+        .custom-music-btn::before { content: "🎵"; font-size: 22px; }
+        .difficulty-option {
+            padding: 15px;
+            font-size: 20px;
+            color: #fff;
+            background: url('ui_btn_wjms_gry.png') no-repeat center center / cover;
+            background-color: #444;
+            border: none;
+            border-radius: 10px;
+            width: 100%;
+            margin-bottom: 10px;
+            cursor: pointer;
+            position: relative;
+            box-shadow: none;
+            transition: transform 0.1s ease;
+        }
+        .difficulty-option.locked {
+            background: url('ui_btn_wjms_gry.png') no-repeat center center / cover;
+            background-color: #222;
+            color: #888;
+            cursor: not-allowed;
+        }
+        .difficulty-option.locked::after {
+            content: attr(data-need);
+            position: absolute;
+            right: 10px;
+            font-size: 14px;
+            color: #ff0000;
+        }
+        .difficulty-option.super-hell {
+            background: url('ui_btn_wjms_red.png') no-repeat center center / cover;
+        }
+        .close-modal {
+            padding: 10px 20px;
+            font-size: 18px;
+            color: #fff;
+            background: #ff0000;
+            border: none;
+            border-radius: 10px;
+            margin-top: 15px;
+            cursor: pointer;
+            box-shadow: none;
+            transition: transform 0.1s ease;
+        }
+        .replace-diff-option {
+            padding: 15px;
+            font-size: 20px;
+            color: #fff;
+            background: #444;
+            border: none;
+            border-radius: 10px;
+            width: 100%;
+            margin-bottom: 10px;
+            cursor: pointer;
+            box-shadow: none;
+            transition: transform 0.1s ease;
+        }
+        .exit-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            padding: 8px 16px;
+            font-size: 16px;
+            color: #fff;
+            background: #ff3333;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            z-index: 20;
+            display: none;
+            box-shadow: none;
+            transition: transform 0.1s ease;
+        }
+        .skill-btn {
+            position: absolute;
+            bottom: 100px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            z-index: 10;
+            display: none;
+            touch-action: manipulation;
+            box-shadow: none;
+            transition: transform 0.1s ease;
+        }
+        button:active { transform: scale(0.95); }
+        .replace-diff-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0,0,0,0.8);
+            z-index: 10000;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .replace-modal-content {
+            background: #222;
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            width: 80%;
+            max-width: 300px;
+        }
+        .replace-modal-title { color: #fff; font-size: 24px; margin-bottom: 20px; font-weight: bold; }
+        .replace-success-tip { color: #00ff99; font-size: 18px; margin-top: 15px; display: none; }
+        .difficulty-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0,0,0,0.8);
+            z-index: 9999;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .reward-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0,0,0,0.7);
+            z-index: 9999;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .reward-content {
+            position: relative;
+            width: 80%;
+            max-width: 350px;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+        .reward-qrcode { width: 100%; height: auto; display: block; }
+        .reward-title {
+            position: absolute;
+            top: 10px;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            color: #fff;
+            font-size: 20px;
+            font-weight: bold;
+            text-shadow: 0 0 5px #000;
+        }
+        .modal-content {
+            background: #222;
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            width: 80%;
+            max-width: 300px;
+        }
+        .modal-title { color: #fff; font-size: 24px; margin-bottom: 20px; font-weight: bold; }
+        .tip-text { color: #ff0000; font-size: 16px; margin-top: 10px; display: none; }
+        #gameCanvas {
+            border: none;
+            background: #1a1a2e;
+            width: 100vw;
+            height: calc(100vh - 80px);
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: none;
+            touch-action: none;
+        }
+        .info {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            color: #fff;
+            font-size: 16px;
+            z-index: 10;
+            display: none;
+        }
+        .attack-btn { right: 20px; background: #ff3300; }
+        .skill1-btn { left: 20px; background: #9900ff; color: #fff; font-size: 14px; font-weight: bold; }
+        .skill2-btn { left: 90px; background: #00ccff; color: #fff; font-size: 14px; font-weight: bold; }
+        .dragon-bg {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 80px;
+            background: #8B4513;
+            z-index: 5;
+            display: none;
+        }
+        #musicFileInput { display: none; }
+        .video-loss-tip {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255,0,0,0.8);
+            color: #fff;
+            padding: 10px 20px;
+            font-size: 18px;
+            border-radius: 5px;
+            z-index: 99998;
+            display: none;
+            text-align: center;
+        }
+        .loading-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #000;
+            z-index: 99999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .loading-container.active { opacity: 1; pointer-events: all; }
+        .dragon-icon {
+            width: 120px;
+            height: 120px;
+            margin-bottom: 30px;
+            background: linear-gradient(45deg, #ff9900, #ff3300);
+            border-radius: 50%;
+            animation: dragonBounce 1.2s ease-in-out infinite alternate, dragonRotate 6s linear infinite;
+            box-shadow: 0 0 30px rgba(255,153,0,0.8), 0 0 60px rgba(255,51,0,0.5);
+        }
+        .loading-text {
+            font-size: 28px;
+            color: #00ff99;
+            text-shadow: 0 0 10px rgba(0,255,153,0.7);
+            animation: textPulse 1.5s ease-in-out infinite;
+        }
+        .loading-particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: rgba(0,255,153,0.6);
+            animation: particleFloat 3s ease-in-out infinite;
+        }
+        @keyframes dragonBounce {
+            0% { transform: scale(1) translateY(0); }
+            100% { transform: scale(1.1) translateY(-15px); }
+        }
+        @keyframes dragonRotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        @keyframes textPulse {
+            0%,100% { opacity: 0.7; }
+            50% { opacity: 1; }
+        }
+        @keyframes particleFloat {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-20px) rotate(360deg); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="font-error-tip" id="fontErrorTip">字体文件已丢失</div>
+    <div class="video-loss-tip" id="videoLossTip">Unity视频已丢失</div>
+    <div class="fullscreen-splash" id="splashContainer">
+        <video class="splash-video" id="splashVideo" autoplay playsinline muted preload="auto">
+            <source src="Unity.mp4" type="video/mp4">
+        </video>
+    </div>
+    <div class="video-update-modal" id="videoUpdateModal">
+        <div class="update-title">发现新视频更新！</div>
+        <div class="update-desc">已自动接收最新视频，点击立即替换生效</div>
+        <button class="update-btn" id="confirmUpdateBtn">立即替换</button>
+    </div>
+    <div class="loading-container" id="loadingContainer">
+        <div class="loading-particles" id="loadingParticles"></div>
+        <div class="dragon-icon"></div>
+        <div class="loading-text">加载中...</div>
+    </div>
+    <div class="main-menu" id="mainMenu">
+        <div class="level-info">等级: <span id="playerLevel">0</span> | 龙晶: <span id="menuCrystal">0</span></div>
+        <button class="level-up-btn" id="levelUpBtn">升级</button>
+        <div class="menu-video-container">
+            <video class="menu-video" id="menuVideo" autoplay loop playsinline>
+                <source src="Video.mp4" type="video/mp4">
+            </video>
+        </div>
+        <div class="non-commercial-tip">本软件只提供学习，请不要用于商业用途！</div>
+        <button class="start-btn" id="startGameBtn">进入游戏</button>
+        <button class="gold-rush-btn" id="goldRushBtn">开始摸金</button>
+        <button class="reward-btn" id="rewardBtn">官方抖音</button>
+        <button class="difficulty-btn" id="difficultyBtn">选择难度</button>
+        <div class="difficulty-modal" id="difficultyModal">
+            <div class="modal-content">
+                <div class="modal-title">请选择难度</div>
+                <button class="difficulty-option" data-diff="normal" data-need="0级解锁">普通</button>
+                <button class="difficulty-option locked" data-diff="hard" data-need="2级解锁">高级</button>
+                <button class="difficulty-option locked" data-diff="extreme" data-need="10级解锁">极限</button>
+                <button class="difficulty-option locked" data-diff="hell" data-need="20级解锁">炼狱</button>
+                <button class="difficulty-option locked super-hell" data-diff="superHell" data-need="40级解锁">超级炼狱</button>
+                <div class="tip-text" id="diffTip">没有达到要求你玩个几把😡</div>
+                <button class="close-modal" id="closeModal">关闭</button>
+            </div>
+        </div>
+    </div>
+    <div class="reward-modal" id="rewardModal">
+        <div class="reward-content">
+            <div class="reward-title">感谢支持作者～</div>
+            <img src="mm_facetoface_collect_qrcode_1765634445450.png" alt="打赏二维码" class="reward-qrcode">
+        </div>
+    </div>
+    <div class="info">HP: <span id="hp">100</span> | 龙晶: <span id="crystal">0</span> | 分数: <span id="score">0</span> | 难度: <span id="diffText">普通</span> | 等级: <span id="gameLevel">0</span></div>
+    <button class="exit-btn" id="exitBtn">退出游戏</button>
+    <canvas id="gameCanvas"></canvas>
+    <div class="dragon-bg"></div>
+    <button class="skill-btn attack-btn"></button>
+    <button class="skill-btn skill1-btn">咆哮</button>
+    <button class="skill-btn skill2-btn">冲锋</button>
+    <button class="custom-music-btn" id="customMusicBtn">自选音乐</button>
+    <button class="official-group-btn" id="officialGroupBtn" onclick="window.open('https://qun.qq.com/universal-share/share?ac=1&authKey=Id%2BzNy93wYMpJy8My86IHISS5BGotwMu9C7VpXWPcMrH4cFn22VsEEUmxydgVwuC&busi_data=eyJncm91cENvZGUiOiIxMDYyNDYyMTYxIiwidG9rZW4iOiJ4c0FYRmRlRmRHdlRCekE4OHBXNWZQSkdhdyt1VVNqVnR6MWszT2pMcisza0JRdVFwMnNtY2xQOGZxYWhhdjZnIiwidWluIjoiMTQ5NzM2ODE4MSJ9&data=PFUfcE8G2Pmx9dE2EzMdrV016iMpOJ2Yk286grrBf0XrGcuC4AIzxrzg_xudI9n7uviMZLCwd0opYnC7ljekyw&svctype=4&tempid=h5_group_info', '_blank')">官方QQ群</button>
+    <input type="file" id="musicFileInput" accept="*">
+    <div class="replace-diff-modal" id="replaceDiffModal">
+        <div class="replace-modal-content">
+            <div class="replace-modal-title">选择要替换的难度音乐</div>
+            <button class="replace-diff-option" data-target-diff="normal">普通</button>
+            <button class="replace-diff-option" data-target-diff="hard">高级</button>
+            <button class="replace-diff-option" data-target-diff="extreme">极限</button>
+            <button class="replace-diff-option" data-target-diff="hell">炼狱</button>
+            <button class="replace-diff-option" data-target-diff="superHell">超级炼狱</button>
+            <div class="replace-success-tip" id="replaceSuccessTip">替换成功！游戏中立即生效～</div>
+            <button class="close-modal" id="closeReplaceModal">关闭</button>
+        </div>
+    </div>
+
+    <script>
+        // ---------- 开屏视频控制 ----------
+        const splashContainer = document.getElementById('splashContainer');
+        const splashVideo = document.getElementById('splashVideo');
+        const mainMenu = document.getElementById('mainMenu');
+        const videoLossTip = document.getElementById('videoLossTip');
+        let lastValidTime = 0;
+        const loadingContainer = document.getElementById('loadingContainer');
+        const loadingParticles = document.getElementById('loadingParticles');
+        
+        splashVideo.addEventListener('seeking', (e) => {
+            if (splashVideo.currentTime !== lastValidTime) {
+                e.preventDefault();
+                splashVideo.currentTime = lastValidTime;
+            }
+        });
+        splashVideo.volume = 1;
+        splashVideo.muted = true;
+        Object.defineProperty(splashVideo, 'volume', { get: () => 0, set: () => {} });
+        Object.defineProperty(splashVideo, 'muted', { get: () => true, set: () => {} });
+        splashVideo.addEventListener('timeupdate', () => { lastValidTime = splashVideo.currentTime; });
+        
+        function enterMainMenu() {
+            splashContainer.style.display = 'none';
+            mainMenu.style.display = 'flex';
+            updateMenuInfo();
+            checkDiffLock();
+            checkNewVideo();
+            menuVideo.volume = 1;
+            menuVideo.play().catch(err => {
+                document.body.addEventListener('touchstart', () => { menuVideo.play().catch(()=>{}); }, { once: true });
+            });
+        }
+        splashVideo.addEventListener('error', () => { videoLossTip.style.display = 'block'; setTimeout(enterMainMenu, 1000); });
+        splashVideo.addEventListener('ended', enterMainMenu);
+        setTimeout(() => { if (splashContainer.style.display !== 'none') { videoLossTip.style.display = 'block'; enterMainMenu(); } }, 8000);
+        
+        function createLoadingParticles() {
+            loadingParticles.innerHTML = '';
+            for (let i = 0; i < 30; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = `${Math.random() * 100}vw`;
+                particle.style.animationDelay = `${Math.random() * 3}s`;
+                loadingParticles.appendChild(particle);
+            }
+        }
+        
+        // ---------- 音效 ----------
+        const clickSound = new Audio('door.mp3');
+        clickSound.volume = 1;
+        const difficultyModalSound = new Audio('8bX9.mp3');
+        difficultyModalSound.volume = 1;
+        function playClickSound() { clickSound.currentTime = 0; clickSound.play().catch(e=>console.log); }
+        function playDifficultyModalSound() { difficultyModalSound.currentTime = 0; difficultyModalSound.play().catch(e=>console.log); }
+        document.querySelectorAll('button').forEach(btn => { btn.addEventListener('click', playClickSound); });
+        setTimeout(() => { alert('官方QQ群：1062462161'); }, 2900);
+        
+        // ---------- 音乐管理 ----------
+        const originalMusic = {
+            normal: new Audio('1.mp3'),
+            hard: new Audio('2.mp3'),
+            extreme: new Audio('3.mp3'),
+            hell: new Audio('4.mp3'),
+            superHell: new Audio('Donk.mp3')
+        };
+        Object.values(originalMusic).forEach(music => { music.loop = true; music.volume = 1; });
+        let currentMusic = { ...originalMusic };
+        let activeMusicInstance = null;
+        
+        const soundEffects = {
+            defeat: [new Audio('7M9.mp3'), new Audio('7M9.mp3'), new Audio('7M9.mp3')],
+            shoot: new Audio('Audio.mp3')
+        };
+        soundEffects.defeat.forEach(effect => { effect.volume = 1; effect.preload = 'auto'; });
+        soundEffects.shoot.volume = 1;
+        
+        // ---------- 游戏数据 ----------
+        let gameData = JSON.parse(localStorage.getItem('dragonGameData')) || { level: 0, crystal: 0, difficulty: 'normal', score: 0, highScore: 0 };
+        const diffConfig = {
+            normal: { enemyHp: 20, spawnRate: 120, enemySpeed: 1.2, needLevel: 0, flowSpeed: 1, attackSpeed: 1 },
+            hard: { enemyHp: 50, spawnRate: 60, enemySpeed: 2, needLevel: 2, flowSpeed: 1.3, attackSpeed: 1.2 },
+            extreme: { enemyHp: 55, spawnRate: 55, enemySpeed: 2.2, needLevel: 10, flowSpeed: 1.3, attackSpeed: 1.3 },
+            hell: { enemyHp: 80, spawnRate: 40, enemySpeed: 2.8, needLevel: 20, flowSpeed: 1.6, attackSpeed: 1.5 },
+            superHell: { enemyHp: 80, spawnRate: 25, enemySpeed: 4.5, needLevel: 40, flowSpeed: 3.0, attackSpeed: 2.0 }
+        };
+        function getLevelUpCost(level) { return (level + 1) * 10; }
+        
+        const menuVideo = document.getElementById('menuVideo');
+        const playerLevelSpan = document.getElementById('playerLevel');
+        const menuCrystalSpan = document.getElementById('menuCrystal');
+        const levelUpBtn = document.getElementById('levelUpBtn');
+        const gameLevelSpan = document.getElementById('gameLevel');
+        const difficultyBtn = document.getElementById('difficultyBtn');
+        const difficultyModal = document.getElementById('difficultyModal');
+        const closeModal = document.getElementById('closeModal');
+        const diffOptions = document.querySelectorAll('.difficulty-option');
+        const diffTip = document.getElementById('diffTip');
+        const diffText = document.getElementById('diffText');
+        const startGameBtn = document.getElementById('startGameBtn');
+        const goldRushBtn = document.getElementById('goldRushBtn');
+        const exitBtn = document.getElementById('exitBtn');
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const hpSpan = document.getElementById('hp');
+        const crystalSpan = document.getElementById('crystal');
+        const scoreSpan = document.getElementById('score');
+        const attackBtn = document.querySelector('.attack-btn');
+        const skill1Btn = document.querySelector('.skill1-btn');
+        const skill2Btn = document.querySelector('.skill2-btn');
+        let rewardBtn = document.getElementById('rewardBtn');
+        const rewardModal = document.getElementById('rewardModal');
+        const rewardContent = document.querySelector('.reward-content');
+        
+        const videoUpdateModal = document.getElementById('videoUpdateModal');
+        const confirmUpdateBtn = document.getElementById('confirmUpdateBtn');
+        let hasNewVideo = false, newVideoBlob = null;
+        const customMusicBtn = document.getElementById('customMusicBtn');
+        const musicFileInput = document.getElementById('musicFileInput');
+        const replaceDiffModal = document.getElementById('replaceDiffModal');
+        const replaceDiffOptions = document.querySelectorAll('.replace-diff-option');
+        const closeReplaceModal = document.getElementById('closeReplaceModal');
+        const replaceSuccessTip = document.getElementById('replaceSuccessTip');
+        let selectedMusicFile = null;
+        
+        function checkNewVideo() {
+            const cachedVideo = localStorage.getItem('gameVideoCache');
+            if (cachedVideo) {
+                const uint8Array = new Uint8Array(JSON.parse(cachedVideo));
+                newVideoBlob = new Blob([uint8Array], { type: 'video/mp4' });
+                hasNewVideo = true;
+                videoUpdateModal.style.display = 'block';
+            }
+        }
+        confirmUpdateBtn.addEventListener('click', () => {
+            if (!newVideoBlob) return;
+            menuVideo.pause();
+            const newVideoUrl = URL.createObjectURL(newVideoBlob);
+            menuVideo.src = newVideoUrl;
+            menuVideo.play().catch(()=>{});
+            videoUpdateModal.style.display = 'none';
+            setTimeout(() => { alert('视频替换成功！下次启动游戏自动生效～'); localStorage.removeItem('gameVideoCache'); hasNewVideo = false; newVideoBlob = null; }, 1000);
+        });
+        
+        function updateMenuInfo() {
+            playerLevelSpan.textContent = gameData.level;
+            menuCrystalSpan.textContent = gameData.crystal;
+            gameLevelSpan.textContent = gameData.level;
+            scoreSpan.textContent = gameData.score;
+            const cost = getLevelUpCost(gameData.level);
+            levelUpBtn.style.display = gameData.crystal >= cost ? 'block' : 'none';
+            levelUpBtn.textContent = `升级(${cost}龙晶)`;
+        }
+        levelUpBtn.addEventListener('click', () => {
+            const cost = getLevelUpCost(gameData.level);
+            if (gameData.crystal >= cost) {
+                gameData.crystal -= cost;
+                gameData.level += 1;
+                localStorage.setItem('dragonGameData', JSON.stringify(gameData));
+                updateMenuInfo();
+                checkDiffLock();
+            }
+        });
+        function checkDiffLock() {
+            diffOptions.forEach(option => {
+                const diff = option.dataset.diff;
+                option.classList.toggle('locked', gameData.level < diffConfig[diff].needLevel);
+            });
+        }
+        difficultyBtn.addEventListener('click', () => { playDifficultyModalSound(); difficultyModal.style.display = 'flex'; diffTip.style.display = 'none'; });
+        closeModal.addEventListener('click', () => { difficultyModal.style.display = 'none'; });
+        diffOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                if (option.classList.contains('locked')) { diffTip.style.display = 'block'; return; }
+                if (activeMusicInstance) { activeMusicInstance.pause(); activeMusicInstance.currentTime = 0; }
+                gameData.difficulty = option.dataset.diff;
+                localStorage.setItem('dragonGameData', JSON.stringify(gameData));
+                const diffName = { normal: '普通', hard: '高级', extreme: '极限', hell: '炼狱', superHell: '超级炼狱' };
+                diffText.textContent = diffName[gameData.difficulty];
+                if (canvas.style.display === 'block') {
+                    activeMusicInstance = currentMusic[gameData.difficulty];
+                    activeMusicInstance.play().catch(e=>console.log);
+                }
+                difficultyModal.style.display = 'none';
+            });
+        });
+        exitBtn.addEventListener('click', () => {
+            gameData.score = player.score; gameData.crystal = player.crystal; gameData.highScore = Math.max(gameData.highScore, player.score);
+            localStorage.setItem('dragonGameData', JSON.stringify(gameData));
+            if (activeMusicInstance) { activeMusicInstance.pause(); activeMusicInstance.currentTime = 0; activeMusicInstance = null; }
+            menuVideo.play().catch(e=>console.log);
+            canvas.style.display = 'none';
+            document.querySelector('.info').style.display = 'none';
+            document.querySelector('.dragon-bg').style.display = 'none';
+            document.querySelectorAll('.skill-btn').forEach(btn => btn.style.display = 'none');
+            exitBtn.style.display = 'none';
+            mainMenu.style.display = 'flex';
+            updateMenuInfo();
+        });
+        startGameBtn.addEventListener('click', () => {
+            loadingContainer.classList.add('active');
+            createLoadingParticles();
+            menuVideo.pause();
+            const currentDiff = gameData.difficulty;
+            if (activeMusicInstance) { activeMusicInstance.pause(); activeMusicInstance.currentTime = 0; }
+            const loadingDuration = 1000 + Math.random() * 1000;
+            setTimeout(() => {
+                activeMusicInstance = currentMusic[currentDiff];
+                activeMusicInstance.play().catch(e=>console.log);
+                loadingContainer.classList.remove('active');
+                mainMenu.style.display = 'none';
+                canvas.style.display = 'block';
+                document.querySelector('.info').style.display = 'block';
+                document.querySelector('.dragon-bg').style.display = 'block';
+                document.querySelectorAll('.skill-btn').forEach(btn => btn.style.display = 'block');
+                exitBtn.style.display = 'block';
+                resizeCanvas();
+                player.crystal = gameData.crystal;
+                player.score = gameData.score;
+                player.hp = 100;
+                player.x = canvas.width / 2 - 25;
+                player.y = canvas.height - 60;
+                const diffName = { normal: '普通', hard: '高级', extreme: '极限', hell: '炼狱', superHell: '超级炼狱' };
+                diffText.textContent = diffName[currentDiff];
+                gameLoop();
+            }, loadingDuration);
+        });
+        goldRushBtn.addEventListener('click', () => {
+            playClickSound();
+            menuVideo.pause();
+            if (activeMusicInstance) { activeMusicInstance.pause(); activeMusicInstance.currentTime = 0; }
+            window.location.href = 'I.html';
+        });
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight - 80;
+            if (player) { player.x = canvas.width / 2 - 25; player.y = canvas.height - 60; }
+        }
+        window.addEventListener('resize', resizeCanvas);
+        
+        const player = {
+            x: 0, y: 0, size: 50, speed: 5, hp: 100, attackCd: 0, skill1Cd: 0, skill2Cd: 0,
+            crystal: gameData.crystal, score: gameData.score, touchX: null, attackInterval: null,
+            baseAttackInterval: 50, isMoving: false, isShooting: false
+        };
+        let attacks = [], enemies = [], effects = [], enemySpawnTimer = 0;
+        
+        canvas.addEventListener('touchstart', e => {
+            e.preventDefault();
+            const touch = e.touches[0];
+            if (touch.clientY < canvas.height - 120 && !(touch.clientX > canvas.width-80 && touch.clientY > canvas.height-160) && !(touch.clientX < 80 && touch.clientY > canvas.height-160) && !(touch.clientX>80 && touch.clientX<160 && touch.clientY>canvas.height-160)) {
+                player.isMoving = true;
+                player.touchX = touch.clientX - player.x;
+            }
+        });
+        canvas.addEventListener('touchmove', e => {
+            e.preventDefault();
+            if (!player.isMoving) return;
+            const newX = e.touches[0].clientX - player.touchX;
+            player.x = Math.max(0, Math.min(canvas.width - player.size, newX));
+        });
+        canvas.addEventListener('touchend', () => { player.isMoving = false; });
+        canvas.addEventListener('touchcancel', () => { player.isMoving = false; });
+        
+        function playShootSound() {
+            const shoot = soundEffects.shoot;
+            if (shoot.paused) { shoot.currentTime = 0; shoot.play().catch(e=>console.log); }
+            else { shoot.onended = function() { if (player.isShooting) { shoot.currentTime = 0; shoot.play().catch(e=>console.log); } shoot.onended = null; }; }
+        }
+        function getAvailableDefeatSound() { return soundEffects.defeat.find(e => e.paused) || soundEffects.defeat[0]; }
+        
+        attackBtn.addEventListener('touchstart', (e) => {
+            e.stopPropagation();
+            player.isShooting = true;
+            const cd = diffConfig[gameData.difficulty];
+            const bonus = 1 + gameData.level * 0.05;
+            const interval = Math.max(20, player.baseAttackInterval / (cd.attackSpeed * bonus));
+            playShootSound();
+            player.attackInterval = setInterval(() => {
+                if (player.attackCd === 0) {
+                    attacks.push({ x: player.x+20, y: player.y-20, size: 10, height: 20 });
+                    player.attackCd = 5;
+                    playShootSound();
+                }
+            }, interval);
+        });
+        attackBtn.addEventListener('touchend', () => { player.isShooting = false; clearInterval(player.attackInterval); soundEffects.shoot.onended = null; });
+        attackBtn.addEventListener('touchcancel', () => { player.isShooting = false; clearInterval(player.attackInterval); soundEffects.shoot.onended = null; });
+        skill1Btn.addEventListener('touchstart', (e) => { e.stopPropagation(); if (player.skill1Cd===0) { enemies.forEach(en=>en.y+=40); player.skill1Cd=480; } });
+        skill2Btn.addEventListener('touchstart', (e) => { e.stopPropagation(); if (player.skill2Cd===0) { player.y = Math.max(canvas.height-210, player.y-150); effects.push({x:player.x,y:player.y,timer:15,type:'charge'}); player.skill2Cd=720; setTimeout(()=>{player.y=canvas.height-60;},1500); } });
+        
+        function drawPlayer() {
+            ctx.fillStyle='#ff9900'; ctx.fillRect(player.x,player.y,player.size,player.size);
+            ctx.fillStyle='#ff0000'; ctx.fillRect(player.x,player.y-10,player.size,5);
+            ctx.fillStyle='#00ffff00'; ctx.fillRect(player.x,player.y-10,player.size*(player.hp/100),5);
+        }
+        function updateAttacks() {
+            const cd = diffConfig[gameData.difficulty];
+            const speed = 12 * cd.flowSpeed * (1+gameData.level*0.03);
+            attacks.forEach((a,i)=>{ a.y-=speed; ctx.fillStyle='#ff3300'; ctx.fillRect(a.x,a.y,a.size,a.height); if(a.y<0) attacks.splice(i,1); });
+        }
+        function updateEnemies() {
+            const cd = diffConfig[gameData.difficulty];
+            const spd = cd.enemySpeed * (1+gameData.level*0.04);
+            enemySpawnTimer++;
+            if (enemySpawnTimer % cd.spawnRate === 0) {
+                const hp = cd.enemyHp * (1+gameData.level*0.1);
+                enemies.push({ x:Math.random()*(canvas.width-40), y:-40, size:40, hp:hp, speed:spd });
+            }
+            enemies.forEach((enemy,i)=>{
+                enemy.y += enemy.speed;
+                ctx.fillStyle='#00ccff'; ctx.fillRect(enemy.x,enemy.y,enemy.size,enemy.size);
+                attacks.forEach((a,j)=>{
+                    if (a.x<enemy.x+40 && a.x+10>enemy.x && a.y<enemy.y+40 && a.y+20>enemy.y) {
+                        const dmg = 20 * (1+gameData.level*0.15);
+                        enemy.hp -= dmg;
+                        attacks.splice(j,1);
+                        if (enemy.hp<=0) {
+                            player.score += 10*(gameData.level+1);
+                            if (Math.random()>0.6) { player.crystal++; gameData.crystal=player.crystal; localStorage.setItem('dragonGameData',JSON.stringify(gameData)); }
+                            effects.push({x:enemy.x+20,y:enemy.y+20,timer:10,type:'explode'});
+                            const ds = getAvailableDefeatSound(); ds.currentTime=0; ds.play().catch(e=>console.log);
+                            enemies.splice(i,1);
+                        }
+                    }
+                });
+                if (player.x<enemy.x+40 && player.x+50>enemy.x && player.y<enemy.y+40 && player.y+50>enemy.y) {
+                    const reduce = 3*(1+cd.enemySpeed*0.1);
+                    player.hp = Math.max(0, player.hp-reduce);
+                    player.score = Math.max(0, player.score-reduce*10);
+                    enemies.splice(i,1);
+                    effects.push({x:player.x+25,y:player.y+25,timer:8,type:'hurt'});
+                }
+                if (enemy.y>canvas.height) enemies.splice(i,1);
+            });
+        }
+        function drawEffects() {
+            effects.forEach((e,i)=>{
+                if(e.type==='explode'){ ctx.fillStyle=`rgba(255,${100+e.timer*15},0,${e.timer/10})`; ctx.beginPath(); ctx.arc(e.x,e.y,20-e.timer,0,Math.PI*2); ctx.fill(); }
+                else if(e.type==='hurt'){ ctx.fillStyle=`rgba(255,0,0,${e.timer/8})`; ctx.fillRect(player.x-10,player.y-10,70,70); }
+                else if(e.type==='charge'){ ctx.fillStyle=`rgba(255,200,0,${e.timer/15})`; ctx.fillRect(player.x-20,player.y-20,90,90); }
+                e.timer--; if(e.timer<=0) effects.splice(i,1);
+            });
+        }
+        function updateInfo() {
+            hpSpan.textContent = Math.ceil(player.hp);
+            crystalSpan.textContent = player.crystal;
+            scoreSpan.textContent = player.score;
+            skill1Btn.textContent = player.skill1Cd>0 ? Math.ceil(player.skill1Cd/60) : '咆哮';
+            skill2Btn.textContent = player.skill2Cd>0 ? Math.ceil(player.skill2Cd/60) : '冲锋';
+            gameData.score = player.score; gameData.crystal = player.crystal;
+            localStorage.setItem('dragonGameData', JSON.stringify(gameData));
+            updateMenuInfo();
+        }
+        function updateCooldowns() {
+            player.attackCd = Math.max(0, player.attackCd-1);
+            player.skill1Cd = Math.max(0, player.skill1Cd-1);
+            player.skill2Cd = Math.max(0, player.skill2Cd-1);
+        }
+        function checkGameOver() {
+            if (player.hp<=0) {
+                const ds = getAvailableDefeatSound(); ds.currentTime=0; ds.play().catch(e=>console.log);
+                if (activeMusicInstance) { activeMusicInstance.pause(); activeMusicInstance.currentTime=0; activeMusicInstance=null; }
+                ctx.fillStyle='#ff0000'; ctx.font='40px CustomFont, Arial'; ctx.textAlign='center';
+                ctx.fillText('失败！分数：'+player.score, canvas.width/2, canvas.height/2);
+                ctx.font='24px CustomFont, Arial';
+                ctx.fillText('最高分数：'+gameData.highScore, canvas.width/2, canvas.height/2+80);
+                ctx.fillText('点击屏幕返回主界面', canvas.width/2, canvas.height/2+120);
+                canvas.addEventListener('touchstart', restartGame, { once: true });
+                return true;
+            }
+            return false;
+        }
+        function restartGame() {
+            gameData.score = player.score; gameData.crystal = player.crystal; gameData.highScore = Math.max(gameData.highScore, player.score);
+            localStorage.setItem('dragonGameData', JSON.stringify(gameData));
+            if (activeMusicInstance) { activeMusicInstance.pause(); activeMusicInstance.currentTime=0; activeMusicInstance=null; }
+            soundEffects.defeat.forEach(e=>{ e.pause(); e.currentTime=0; });
+            soundEffects.shoot.pause(); soundEffects.shoot.currentTime=0;
+            menuVideo.play().catch(e=>console.log);
+            player.x = canvas.width/2-25; player.y = canvas.height-60; player.hp=100; player.score=0;
+            player.attackCd=0; player.skill1Cd=0; player.skill2Cd=0; player.isMoving=false; player.isShooting=false;
+            attacks=[]; enemies=[]; effects=[]; enemySpawnTimer=0; clearInterval(player.attackInterval);
+            updateInfo();
+            canvas.style.display='none'; document.querySelector('.info').style.display='none';
+            document.querySelector('.dragon-bg').style.display='none';
+            document.querySelectorAll('.skill-btn').forEach(btn=>btn.style.display='none');
+            exitBtn.style.display='none'; mainMenu.style.display='flex';
+            updateMenuInfo();
+        }
+        function gameLoop() {
+            ctx.clearRect(0,0,canvas.width,canvas.height);
+            if (checkGameOver()) return;
+            updateCooldowns();
+            drawPlayer();
+            updateAttacks();
+            updateEnemies();
+            drawEffects();
+            updateInfo();
+            requestAnimationFrame(gameLoop);
+        }
+        
+        // ---------- 打赏按钮改为跳转抖音 ----------
+        if (rewardBtn) {
+            const newRewardBtn = rewardBtn.cloneNode(true);
+            rewardBtn.parentNode.replaceChild(newRewardBtn, rewardBtn);
+            rewardBtn = newRewardBtn;
+            rewardBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                playClickSound();
+                const url = 'https://v.douyin.com/AFk7XBwuscw/';
+                const win = window.open(url, '_blank');
+                if (!win || win.closed || typeof win.closed === 'undefined') window.location.href = url;
+            });
+        }
+        rewardModal.addEventListener('click', (e) => { if (e.target === rewardModal) { rewardModal.style.display = 'none'; menuVideo.play().catch(()=>{}); } });
+        rewardContent.addEventListener('click', (e) => e.stopPropagation());
+        
+        // ---------- 自选音乐 ----------
+        customMusicBtn.addEventListener('click', () => musicFileInput.click());
+        musicFileInput.addEventListener('change', (e) => {
+            if (!e.target.files[0]) return;
+            selectedMusicFile = e.target.files[0];
+            replaceDiffModal.style.display = 'flex';
+            replaceSuccessTip.style.display = 'none';
+        });
+        replaceDiffOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                if (!selectedMusicFile) return;
+                const targetDiff = option.dataset.targetDiff;
+                const customAudio = new Audio(URL.createObjectURL(selectedMusicFile));
+                customAudio.loop = true;
+                customAudio.volume = 1;
+                const isCurrent = gameData.difficulty === targetDiff;
+                if (isCurrent && canvas.style.display === 'block' && activeMusicInstance) {
+                    activeMusicInstance.pause();
+                    activeMusicInstance.currentTime = 0;
+                    activeMusicInstance = customAudio;
+                    customAudio.play().catch(err => { alert('该文件无法播放，请选择其他音频文件！'); activeMusicInstance = currentMusic[targetDiff]; activeMusicInstance.play().catch(()=>{}); });
+                }
+                currentMusic[targetDiff] = customAudio;
+                replaceSuccessTip.style.display = 'block';
+                setTimeout(() => { replaceDiffModal.style.display = 'none'; }, 3000);
+            });
+        });
+        closeReplaceModal.addEventListener('click', () => { replaceDiffModal.style.display = 'none'; replaceSuccessTip.style.display = 'none'; });
+        
+        // ---------- 禁止后台播放 (页面隐藏时暂停所有声音) ----------
+        let isPageHidden = false;
+        function pauseAllAudio() {
+            if (activeMusicInstance && !activeMusicInstance.paused) { activeMusicInstance.pause(); activeMusicInstance._wasPlaying = true; }
+            if (menuVideo && !menuVideo.paused) { menuVideo.pause(); menuVideo._wasPlaying = true; }
+            if (clickSound && !clickSound.paused) { clickSound.pause(); clickSound.currentTime = 0; }
+            if (difficultyModalSound && !difficultyModalSound.paused) { difficultyModalSound.pause(); difficultyModalSound.currentTime = 0; }
+            if (soundEffects.shoot && !soundEffects.shoot.paused) { soundEffects.shoot.pause(); soundEffects.shoot.currentTime = 0; soundEffects.shoot.onended = null; }
+            soundEffects.defeat.forEach(s => { if (!s.paused) { s.pause(); s.currentTime = 0; } });
+        }
+        function resumeAllAudio() {
+            if (activeMusicInstance && activeMusicInstance._wasPlaying) { activeMusicInstance.play().catch(()=>{}); delete activeMusicInstance._wasPlaying; }
+            if (menuVideo && menuVideo._wasPlaying) { menuVideo.play().catch(()=>{}); delete menuVideo._wasPlaying; }
+        }
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) { isPageHidden = true; pauseAllAudio(); }
+            else { isPageHidden = false; resumeAllAudio(); }
+        });
+        function wrapAudioPlay(audio) {
+            if (!audio || audio._wrapped) return;
+            const orig = audio.play;
+            audio.play = function() { if (isPageHidden) return Promise.resolve(); return orig.call(audio); };
+            audio._wrapped = true;
+        }
+        wrapAudioPlay(clickSound);
+        wrapAudioPlay(difficultyModalSound);
+        wrapAudioPlay(soundEffects.shoot);
+        soundEffects.defeat.forEach(s => wrapAudioPlay(s));
+        Object.values(originalMusic).forEach(m => wrapAudioPlay(m));
+        // 劫持 Audio 构造函数，使得新创建的音频自动包装
+        const OriginalAudio = window.Audio;
+        window.Audio = function(...args) {
+            const audio = new OriginalAudio(...args);
+            wrapAudioPlay(audio);
+            return audio;
+        };
+    </script>
+</body>
+</html>
